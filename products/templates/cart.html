@@ -1,0 +1,103 @@
+
+{% extends "layout.html" %}
+
+{% block title %}
+Shopping Cart | SmartShop
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <h1 class="text-center mb-4">Your Shopping Cart</h1>
+
+    {% if cart_items %}
+
+    <div class="table-responsive">
+        <table class="table table-dark table-bordered align-middle">
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+
+                    <td>₹{{ item.product.price }}</td>
+
+                    <!-- Quantity and Update button -->
+                    <td>
+                        <form method="post"
+                              action="{% url 'cart_update' item.product.id %}"
+                              class="d-flex gap-2">
+
+                            {% csrf_token %}
+
+                            <input
+                                type="number"
+                                name="quantity"
+                                value="{{ item.quantity }}"
+                                min="1"
+                                max="{{ item.product.stock }}"
+                                class="form-control"
+                                style="width: 90px;"
+                                required
+                            >
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-sm">
+                                Update
+                            </button>
+                        </form>
+                    </td>
+
+                    <td>₹{{ item.subtotal }}</td>
+
+                    <!-- Remove button -->
+                    <td>
+                        <form method="post"
+                              action="{% url 'cart_remove' item.product.id %}">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm">
+                                Remove
+                            </button>
+                        </form>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    <h3 class="text-end mt-4">
+        Total:
+        <span class="text-success">₹{{ total }}</span>
+    </h3>
+
+    {% else %}
+
+        <p class="text-center fs-5">Your cart is empty.</p>
+
+    {% endif %}
+
+    <a href="{% url 'product_list' %}"
+       class="btn btn-outline-light mt-3">
+        Continue Shopping
+    </a>
+
+</div>
+
+{% endblock %}
